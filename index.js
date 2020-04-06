@@ -61,15 +61,34 @@ app.get('/product/:key', (req, res) => {
         });
         client.close();
     });
-
-
     //const name = users[id];
     //res.send({id,name});
     //res.send(name);
     //console.log(req.params.id);
-})
+});
 
 //post
+
+app.post('/getProductsByKey', (req, res) => {
+    const key = req.params.key;
+    const productKeys = req.body;
+    //console.log(productKeys);   
+    client = new MongoClient(uri, { useNewUrlParser: true });
+    client.connect(err => {
+        const collection = client.db("onlineStore").collection("products");
+        collection.find({key: { $in: productKeys }}).toArray((err, documents) =>{
+            if(err){
+                console.log(err);
+                res.status(500).send({message:err});
+            }
+            else {
+                res.send(documents);
+            }
+        });
+        client.close();
+    });
+});
+
 
 app.post('/addProduct', (req, res) => {
     //save to database

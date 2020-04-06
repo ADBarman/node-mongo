@@ -22,7 +22,7 @@ app.get('/products', (req, res) => {
     client = new MongoClient(uri, { useNewUrlParser: true });
     client.connect(err => {
         const collection = client.db("onlineStore").collection("products");
-        collection.find().limit(5).toArray((err, documents) =>{
+        collection.find().toArray((err, documents) =>{
             if(err){
                 console.log(err);
                 res.status(500).send({message:err});
@@ -44,11 +44,27 @@ app.get('/banana', (req, res) => {
     res.send({fruit:'banana', quantity:1000, price:10000});
 })
 
-app.get('/users/:id', (req, res) => {
-    const id = req.params.id;
-    console.log(req.query.sort);
-    const name = users[id];
-    res.send({id,name});
+app.get('/product/:key', (req, res) => {
+    const key = req.params.key;
+    //console.log(req.query.sort);
+    client = new MongoClient(uri, { useNewUrlParser: true });
+    client.connect(err => {
+        const collection = client.db("onlineStore").collection("products");
+        collection.find({key}).toArray((err, documents) =>{
+            if(err){
+                console.log(err);
+                res.status(500).send({message:err});
+            }
+            else {
+                res.send(documents[0]);
+            }
+        });
+        client.close();
+    });
+
+
+    //const name = users[id];
+    //res.send({id,name});
     //res.send(name);
     //console.log(req.params.id);
 })
@@ -85,4 +101,4 @@ app.post('/addProduct', (req, res) => {
 });
 
 const port = process.env.PORT || 3000;
-app.listen(port,() => console.log('Listening to port 3000'))
+app.listen(port,() => console.log('Listening to port 4200'))
